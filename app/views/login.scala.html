@@ -1,0 +1,24 @@
+@(loginForm : Form[LoginUser])(implicit messages: Messages, flash:Flash)
+
+
+@import helper._
+
+
+@main("user login"){
+
+
+@helper.form(action = routes.LoginController.handleLogin()){
+<div class="jumbotron">
+    <div>@flash.get("exists").fold("")(x=>x)
+        @flash.get("incorrect").fold("")(x=>x)
+        @flash.get("passwordchanged").fold("")(x=>x)
+    </div>
+    @helper.inputText(loginForm("username"),'_showConstraints->false, '_label->"Username")
+    @helper.inputPassword(loginForm("password"),'_showConstraints->false, '_label->"Password")
+    <button class="btn" type="submit">Submit</button>
+    }
+
+    <a class="btn" href="@routes.LoginController.showForgetForm()">Forgot Password </a>
+</div>
+
+}

@@ -1,0 +1,30 @@
+@(registerForm:Form[User])(implicit messages: Messages)
+
+
+@import helper._
+<div >
+    @if(registerForm.hasGlobalErrors){
+    <ul class="list-group">@for(errors <- registerForm.globalErrors){
+        <li class="list-group-item">@errors.message </li>
+        }
+    </ul>}
+</div>
+@main("User details"){
+@helper.form(action = routes.RegistrationController.handleRegister()){
+@helper.inputText(registerForm("name"),'_showConstraints->false, '_label->"First name")
+@helper.inputText(registerForm("middleName"),'_showConstraints->false, '_label->"Middle name")
+@helper.inputText(registerForm("lastName"),'_showConstraints->false, '_label->"Last name")
+@helper.inputText(registerForm("userName"),'_showConstraints->false, '_label->"Username")
+@helper.inputPassword(registerForm("password"),'_showConstraints->false, '_label->"Password")
+@helper.inputPassword(registerForm("re_enterPassword"),'_showConstraints->false, '_label->"Reenter password")
+@helper.inputText(registerForm("mobileNo"),'_showConstraints->false, '_label->"Mobile no")
+@helper.select(registerForm("gender"),options(List("male","female")),'_showConstraints->false, '_label->"Gender")
+@helper.inputText(registerForm("age"), '_showConstraints->false, '_label->"Age")
+<h3>Hobbies</h3>
+@helper.checkbox(registerForm("hobbies.reading"),'_label->"Reading",'_value->"true",'_showConstraints->false)
+@helper.checkbox(registerForm("hobbies.music"),'_label->"Music",'_value->"true",'_showConstraints->false)
+@helper.checkbox(registerForm("hobbies.movies"),'_label->"Movies",'_value->"true",'_showConstraints->false)
+
+<button type="submit">Submit</button>
+}
+}
