@@ -14,6 +14,7 @@ case class LoginUser(username: String, password: String)
 class LoginController @Inject()(userRepository: UserRepository, forms: UserForms, implicit val messagesApi: MessagesApi)
   extends Controller with I18nSupport {
 
+  implicit val messages: MessagesApi = messagesApi
   def showLoginForm(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
     Ok(views.html.login(forms.loginForm))
   }
@@ -33,12 +34,13 @@ class LoginController @Inject()(userRepository: UserRepository, forms: UserForms
         for {bool1 <- userRepository.matchUserLoginDetails(userData.username.trim, userData.password.trim)
              bool2 <- userRepository.isUserEnabled(userData.username.trim)
         } yield {
-          if (bool1 && bool1 == bool2)
-            Redirect(routes.UserProfileController.getProfileDetails()).withSession("email"->userData.username)
-          else if(!bool1)
+          if (bool1 && bool1 == bool2) {
+            Redirect(routes.UserProfileController.getProfileDetails()).withSession("email" -> userData.username)
+          } else if (!bool1) {
             Redirect(routes.LoginController.showLoginForm()).flashing("incorrect" -> "Username or password is incorrect.")
-        else
+          } else {
             Redirect(routes.LoginController.showLoginForm()).flashing("disabled" -> "Your account has been disabled by admin.")
+          }
         }
 
       })
@@ -52,10 +54,10 @@ class LoginController @Inject()(userRepository: UserRepository, forms: UserForms
       },
       userData => {
         userRepository.updatePassword(userData.email, userData.newPassword).map {
-          case false => Redirect(routes.LoginController.showForgetForm()).flashing("emailnotexists"->
-          "Email is not registered in our database.")
+          case false => Redirect(routes.LoginController.showForgetForm()).flashing("emailnotexists" ->
+            "Email is not registered in our database.")
 
-          case true =>  Redirect(routes.LoginController.showLoginForm()).flashing("passwordchanged"->
+          case true => Redirect(routes.LoginController.showLoginForm()).flashing("passwordchanged" ->
             "Password changed successfully. You can log in.")
         }
 

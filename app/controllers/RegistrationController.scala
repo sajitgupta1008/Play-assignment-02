@@ -19,7 +19,6 @@ class RegistrationController @Inject()(userRepository: UserRepository, hobbyRepo
   implicit val messages: MessagesApi = messagesApi
 
   def showRegisterForm(): Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
-    Logger.info(hobbiesList + "")
 
     hobbiesList.map {
       case hobbies: List[String] => Ok(views.html.register(forms.registerForm, hobbies))
@@ -32,6 +31,7 @@ class RegistrationController @Inject()(userRepository: UserRepository, hobbyRepo
     forms.registerForm.bindFromRequest.fold(
       formWithErrors => {
         Logger.info("error occurred" + formWithErrors)
+
         hobbiesList.map(hobbies => BadRequest(views.html.register(formWithErrors, hobbies)))
       },
       userData => {
@@ -46,7 +46,6 @@ class RegistrationController @Inject()(userRepository: UserRepository, hobbyRepo
             userRepository.addUser(user).flatMap {
               case true => userHobbiesRepository.addHobbies(userData.userName, userData.hobbies).map {
                 case Some(x) if x > 0 => Redirect(routes.UserProfileController.getProfileDetails()).withSession("email" -> userData.userName)
-                case _ => InternalServerError("failed to add hobbies")
               }
 
               case false => Future.successful(InternalServerError("failed to add user details"))
