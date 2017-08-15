@@ -20,10 +20,23 @@ POST     /handlelogin               controllers.LoginController.handleLogin
 GET      /forget                    controllers.LoginController.showForgetForm
 POST     /handleforget                    controllers.LoginController.forgetPassword
 
-GET      /showuser                     controllers.UserProfileController.showProfilePage
 
 GET      /userlogout                   controllers.UserProfileController.logout
 
 POST     /updatedetails                 controllers.UserProfileController.updateDetails
 
 GET      /getDetails                   controllers.UserProfileController.getProfileDetails
+
+GET      /showassignment                controllers.AdminController.showAssignmentForm
+
+POST    /addassignment                   controllers.AdminController.addAssignment
+
+
+
+GET     /viewassignment                 controllers.AdminController.viewAssignments
+
+GET      /deleteassignment/:id             controllers.AdminController.deleteAssignment(id:Int)
+
+GET     /viewusers                      controllers.AdminController.viewUsers
+
+GET     /enable/:user/:value            controllers.AdminController.enableOrDisableUser(user,value:Boolean)

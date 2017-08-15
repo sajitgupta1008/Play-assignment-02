@@ -1,4 +1,4 @@
-@(registerForm:Form[User])(implicit messages: Messages)
+@(registerForm:Form[User], hobbyList:List[String])(implicit messages: Messages)
 
 
 @import helper._
@@ -20,11 +20,11 @@
 @helper.inputText(registerForm("mobileNo"),'_showConstraints->false, '_label->"Mobile no")
 @helper.select(registerForm("gender"),options(List("male","female")),'_showConstraints->false, '_label->"Gender")
 @helper.inputText(registerForm("age"), '_showConstraints->false, '_label->"Age")
-<h3>Hobbies</h3>
-@helper.checkbox(registerForm("hobbies.reading"),'_label->"Reading",'_value->"true",'_showConstraints->false)
-@helper.checkbox(registerForm("hobbies.music"),'_label->"Music",'_value->"true",'_showConstraints->false)
-@helper.checkbox(registerForm("hobbies.movies"),'_label->"Movies",'_value->"true",'_showConstraints->false)
-
+@helper.inputCheckboxGroup(
+registerForm("hobbies"),
+options = hobbyList.map(hobbyName => hobbyName->hobbyName),
+'_label -> "Hobbies",
+'_error -> registerForm("hobbies").error.map(_.withMessage("Select one or more hobbies")))
 <button type="submit">Submit</button>
 }
 }

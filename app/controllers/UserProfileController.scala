@@ -1,36 +1,37 @@
 package controllers
 
 import com.google.inject.Inject
-import models.{HobbiesRepository, UserProfileData, UserRepository}
+import models.{HobbiesRepository, UserHobbiesRepository, UserProfileData, UserRepository}
 import play.api.Logger
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, Controller, Request}
 import scala.concurrent.ExecutionContext.Implicits.global
-
 import scala.concurrent.Future
 
-class UserProfileController @Inject()(userRepository: UserRepository, hobbyRepository: HobbiesRepository, forms: UserForms, val messagesApi: MessagesApi)
+class UserProfileController @Inject()(userRepository: UserRepository, hobbyRepository: HobbiesRepository,
+                                      userHobbiesRepository: UserHobbiesRepository, forms: UserForms, val messagesApi: MessagesApi)
   extends Controller with I18nSupport {
 
-  def showProfilePage(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
-    Ok(views.html.userProfile(forms.profileForm))
-  }
 
   def logout(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
-    Redirect(routes.HomeController.index())
+    Redirect(routes.HomeController.index()).withNewSession //TODO proper logout with no back button
   }
 
-  def getProfileDetails: Action[AnyContent] = Action.async{ implicit request: Request[AnyContent] =>
+  def getProfileDetails: Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
 
-    val detailsResult: Future[UserProfileData] = userRepository.getUserDetails(request.session.get("email").get)
-    //TODO gethobbies
+    val userName = request.session.get("email").get
+    val userDetails: Future[UserProfileData] = userRepository.getUserDetails(userName)
+    val userHobbies: Future[List[String]] = userHobbiesRepository.getUserHobbies(userName)
+    val isAdmin: Future[Boolean] = userRepository.isAdmin(userName)
 
-    detailsResult.map { userDetails =>
-      val profile = Profile(userDetails.firstName, userDetails.middleName, userDetails.lastName,
-        userDetails.mobileNo, userDetails.gender, userDetails.age,Hobbies(true,false,false))
-
-      Ok(views.html.userProfile(forms.profileForm.fill(profile)))
-    }
+    for {details <- userDetails
+         hobbies <- userHobbies
+    isadmin<-isAdmin}
+      yield {
+        val profile = Profile(details.firstName, details.middleName, details.lastName,
+          details.mobileNo, details.gender, details.age, hobbies)
+        Ok(views.html.userProfile(forms.profileForm.fill(profile), hobbies,isadmin))
+      }
 
   }
 
@@ -39,21 +40,29 @@ class UserProfileController @Inject()(userRepository: UserRepository, hobbyRepos
     forms.profileForm.bindFromRequest.fold(
       formWithErrors => {
         Logger.info("error occurred" + formWithErrors)
-        Future.successful(BadRequest(views.html.userProfile(formWithErrors)))
+        val userHobbies: Future[List[String]] = userHobbiesRepository.getUserHobbies(request.session.get("email").get)
+        val isAdmin: Future[Boolean] = userRepository.isAdmin(request.session.get("email").get)
+        for {hobbies <- userHobbies
+             isadmin<-isAdmin}
+        yield{ BadRequest(views.html.userProfile(formWithErrors, hobbies,isadmin))}
       },
 
       profile => {
-        //TODO hobbies
+
         val updatedDetails: UserProfileData = UserProfileData(profile.name, profile.middleName, profile.lastName,
           profile.mobileNo, profile.gender, profile.age)
-        userRepository.updateUserDetails(request.session.get("email").get, updatedDetails).map {
-          case true => Redirect(routes.UserProfileController.getProfileDetails).flashing("update"->"User details have been updated")
-          case false =>
-           Redirect(routes.UserProfileController.getProfileDetails).flashing("updatefailed"->"Details could not be updated")
-        }
-        Future.successful(Ok("details changed"))
-        //TODO REDIRECT
-      })
+        val userUpdated = userRepository.updateUserDetails(request.session.get("email").get, updatedDetails)
+        val hobbiesUpdated = userHobbiesRepository.updateHobbies(request.session.get("email").get, profile.hobbies)
 
+        userUpdated.flatMap {
+          case true => hobbiesUpdated.map {
+            case Some(x) if x > 0 => Redirect(routes.UserProfileController.getProfileDetails()).
+              flashing("updatesuccess" -> "User details have been updated")
+            case _ => InternalServerError("hobbies could not be updated")
+          }
+          case false => Future.successful(InternalServerError("user details could not be updated"))
+        }
+
+      })
   }
 }

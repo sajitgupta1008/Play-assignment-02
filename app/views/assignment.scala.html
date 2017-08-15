@@ -1,0 +1,24 @@
+@(assignmentForm : Form[Assignment])(implicit messages: Messages,flash:Flash)
+
+@main("Add assignment"){
+<div> @adminNavBar() </div>
+<br/>
+<br/>
+<div>
+    @flash.get("addsuccess").fold("")(x=>x)
+</div>
+
+@helper.form(action = routes.AdminController.addAssignment){
+@helper.inputText(assignmentForm("title"), '_showConstraints ->false, '_label->"Title")
+@helper.textarea(
+assignmentForm("description"),
+'_label -> "Description",
+'placeholder -> "Any description you want to add",
+'rows -> 5,
+'cols -> 60,
+'_showConstraints ->false
+)<input type="submit">
+}
+
+
+}

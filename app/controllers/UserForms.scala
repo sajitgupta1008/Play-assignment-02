@@ -11,7 +11,9 @@ case class Hobbies(reading: Boolean, music: Boolean, movies: Boolean)
 case class ForgetPassword(email: String, newPassword: String, confirmPassword: String)
 
 case class Profile(name: String, middleName: Option[String], lastName: String
-                   , mobileNo: Long, gender: String, age: Int, hobbies: Hobbies)
+                   , mobileNo: Long, gender: String, age: Int, hobbies: List[String])
+
+case class Assignment(title:String, description:String)
 
 class UserForms {
 
@@ -26,11 +28,7 @@ class UserForms {
     "mobileNo" -> longNumber.verifying(checkLengthConstraint),
     "gender" -> nonEmptyText,
     "age" -> number(min = 18, max = 75),
-    "hobbies" -> mapping(
-      "reading" -> boolean,
-      "music" -> boolean,
-      "movies" -> boolean
-    )(Hobbies.apply)(Hobbies.unapply)
+    "hobbies" -> list(text).verifying(hobbyConstraint)
   )(User.apply)(User.unapply)
     verifying("Password fields do not match", user => user.password == user.re_enterPassword)
   )
@@ -56,12 +54,13 @@ class UserForms {
     "mobileNo" -> longNumber.verifying(checkLengthConstraint),
     "gender" -> nonEmptyText,
     "age" -> number(min = 18, max = 75),
-    "hobbies" -> mapping(
-      "reading" -> boolean,
-      "music" -> boolean,
-      "movies" -> boolean
-    )(Hobbies.apply)(Hobbies.unapply)
+    "hobbies" -> list(text).verifying(hobbyConstraint)
   )(Profile.apply)(Profile.unapply))
+
+  val assignmentForm = Form(mapping(
+    "title" -> nonEmptyText,
+    "description" -> nonEmptyText
+  )(Assignment.apply)(Assignment.unapply))
 
   def allLettersConstraint: Constraint[String] = {
     Constraint("usernameCheck")(
@@ -80,6 +79,16 @@ class UserForms {
         else
           Invalid(ValidationError("mobile number must be 10 digits"))
     })
+  }
+
+  def hobbyConstraint:Constraint[List[String]] = {
+    Constraint("Select atleast one hobby."){
+      list =>
+        if(list.isEmpty)
+          Invalid("Select atleast one hobby.")
+        else
+          Valid
+    }
   }
 
   val allNumbers: Regex = """\d*""".r

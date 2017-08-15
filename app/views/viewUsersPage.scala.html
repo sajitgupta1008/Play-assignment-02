@@ -1,0 +1,42 @@
+@(usersList:List[UserData])
+
+
+@import helper._
+@main("Users"){
+<div> @adminNavBar() </div>
+<br/>
+<br/>
+
+<div class="container">
+    <h2>Users List</h2><br/>
+    @if(usersList.isEmpty){
+    <h3>There are no users.</h3>
+    } else{
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th style="width:33%">Email</th>
+            <th style="width:33%">Enable User</th>
+            <th style="width:34%">Disable User</th>
+        </tr>
+        </thead>
+
+        <tbody>@for(user<-usersList){
+        <tr> @helper.form(action=routes.AdminController.enableOrDisableUser(user.userName,user.isEnabled)){
+            <td>@user.userName</td>
+            @if(user.isEnabled){
+            <td><button value="@user.userName"  disabled>Enable</button></td>
+            <td><button value="@user.userName" >Disable</button></td>
+            }else{
+            <td><button value="@user.userName" >Enable</button></td>
+            <td><button value="@user.userName" disabled>Disable</button></td>
+            }}
+        </tr>
+        }
+        </tbody>
+    </table>
+    }
+</div>
+
+}
+

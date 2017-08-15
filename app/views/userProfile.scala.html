@@ -1,25 +1,20 @@
-@(profileForm:Form[Profile])(implicit messages: Messages)
+@(profileForm:Form[Profile],hobbyList:List[String],isAdmin:Boolean)(implicit messages:Messages , flash:Flash)
 
 @import helper._
 
 @main("User profile"){
 
-<nav class="navbar navbar-inverse">
-    <div class="container-fluid">
-        <div class="navbar-header">
-            <a class="navbar-brand" href="#">User Details</a>
-        </div>
-        <ul class="nav navbar-nav">
-            <li class="active"><a href="#">Profile</a></li>
-            <li><a href="#">View Assignments</a></li>
-        </ul>
-        <ul class="nav navbar-nav navbar-right">
-            <li><a href="@routes.UserProfileController.logout"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
-        </ul>
-    </div>
-</nav>
+<div>@if(isAdmin){
+    @adminNavBar()
+    }else{
+    @userNavBar()
+    }
+</div>
 <br/>
 <br/>
+<div>@flash.get("update").fold("")(x=>x)
+    @flash.get("updatesuccess").fold("")(x=>x)
+</div>
 @helper.form(action = routes.UserProfileController.updateDetails()){
 @helper.inputText(profileForm("name"),'_showConstraints->false, '_label->"First name")
 @helper.inputText(profileForm("middleName"),'_showConstraints->false, '_label->"Middle name")
@@ -27,11 +22,11 @@
 @helper.inputText(profileForm("mobileNo"),'_showConstraints->false, '_label->"Mobile no")
 @helper.select(profileForm("gender"),options(List("male","female")),'_showConstraints->false, '_label->"Gender")
 @helper.inputText(profileForm("age"), '_showConstraints->false, '_label->"Age")
-<h3>Hobbies</h3>
-@helper.checkbox(profileForm("hobbies.reading"),'_label->"Reading",'_value->"true",'_showConstraints->false)
-@helper.checkbox(profileForm("hobbies.music"),'_label->"Music",'_value->"true",'_showConstraints->false)
-@helper.checkbox(profileForm("hobbies.movies"),'_label->"Movies",'_value->"true",'_showConstraints->false)
-
+@helper.inputCheckboxGroup(
+profileForm("hobbies"),
+options = hobbyList.map(hobbyName => hobbyName->hobbyName),
+'_label -> "Hobbies",
+'_error -> profileForm("hobbies").error.map(_.withMessage("Select one or more hobbies")))
 <button type="submit">Submit</button>
 }
 

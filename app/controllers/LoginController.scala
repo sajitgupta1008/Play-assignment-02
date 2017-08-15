@@ -30,14 +30,15 @@ class LoginController @Inject()(userRepository: UserRepository, forms: UserForms
       },
       userData => {
 
-        for {bool1 <- userRepository.matchUserLoginDetails(userData.username, userData.password)
-             bool2 <- userRepository.isUserEnabled(userData.username)
+        for {bool1 <- userRepository.matchUserLoginDetails(userData.username.trim, userData.password.trim)
+             bool2 <- userRepository.isUserEnabled(userData.username.trim)
         } yield {
           if (bool1 && bool1 == bool2)
             Redirect(routes.UserProfileController.getProfileDetails()).withSession("email"->userData.username)
-          //Ok(views.html.displayLoginData(userData))
-          else
+          else if(!bool1)
             Redirect(routes.LoginController.showLoginForm()).flashing("incorrect" -> "Username or password is incorrect.")
+        else
+            Redirect(routes.LoginController.showLoginForm()).flashing("disabled" -> "Your account has been disabled by admin.")
         }
 
       })

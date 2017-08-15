@@ -68,6 +68,18 @@ class UserRepository @Inject()(protected val dbConfigProvider: DatabaseConfigPro
           userData.gender, userData.age)
     }
   }
+
+  def getAllUsers:Future[List[UserData]] = {
+    db.run(userQuery.filter(_.isAdmin===false).to[List].result)
+  }
+
+  def enableOrDisableUser(userName:String, value:Boolean): Future[Boolean] = {
+    db.run(userQuery.filter(_.userName===userName).map(_.isEnabled).update(value)).map(_>0)
+  }
+
+  def isAdmin(userName:String): Future[Boolean] ={
+    db.run(userQuery.filter(_.userName===userName).map(_.isAdmin).to[List].result).map(user => user.head)
+  }
 }
 
 

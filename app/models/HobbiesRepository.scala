@@ -9,40 +9,35 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 
-case class HobbyData(userName: String, hobbyName: String)
+  case class HobbyData(id:Int, hobby: String)
 
 @Singleton
-class HobbiesRepository @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) extends HobbyTable {
+class HobbiesRepository @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) extends HobbyRepositoryTable {
 
   import driver.api._
 
-  def addHobbies(userName: String, hobbies: Hobbies): Future[Boolean] = {
-
-    val hobby1 = if (hobbies.reading) "reading" else ""
-    val hobby2 = if (hobbies.music) "music" else ""
-    val hobby3 = if (hobbies.movies) "movies" else ""
-
-    val list = List(hobby1,hobby2,hobby3)
-
-    val hobbyDataList: List[HobbyData] = list.filter(_.nonEmpty).map(hobby => HobbyData(userName, hobby))
-    db.run(hobbyQuery ++= hobbyDataList).map(_.isDefined)
+  def getHobbies: Future[List[String]] = {
+        db.run(hobbyQuery.map(_.hobby).to[List].result)
   }
+
 }
 
 
-trait HobbyTable extends HasDatabaseConfigProvider[JdbcProfile] {
+trait HobbyRepositoryTable extends HasDatabaseConfigProvider[JdbcProfile] {
 
   import driver.api._
 
-  val hobbyQuery: TableQuery[HobbyMapping] = TableQuery[HobbyMapping]
+  val hobbyQuery: TableQuery[HobbyTable] = TableQuery[HobbyTable]
 
-  class HobbyMapping(tag: Tag) extends Table[HobbyData](tag, "hobbytable") {
+  class HobbyTable(tag: Tag) extends Table[HobbyData](tag, "hobbytable") {
 
-    def userName: Rep[String] = column[String]("username")
+    def id: Rep[Int] = column[Int]("id", O.AutoInc, O.PrimaryKey)
 
-    def hobbyName: Rep[String] = column[String]("hobbyname")
+    def hobby: Rep[String] = column[String]("hobby")
 
-    override def * : ProvenShape[HobbyData] = (userName, hobbyName) <> (HobbyData.tupled, HobbyData.unapply)
+    def * : ProvenShape[HobbyData] = (id, hobby) <> (HobbyData.tupled, HobbyData.unapply)
+
   }
 
 }
+

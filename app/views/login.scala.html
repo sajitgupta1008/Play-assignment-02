@@ -12,6 +12,7 @@
     <div>@flash.get("exists").fold("")(x=>x)
         @flash.get("incorrect").fold("")(x=>x)
         @flash.get("passwordchanged").fold("")(x=>x)
+        @flash.get("disabled").fold("")(x=>x)
     </div>
     @helper.inputText(loginForm("username"),'_showConstraints->false, '_label->"Username")
     @helper.inputPassword(loginForm("password"),'_showConstraints->false, '_label->"Password")
