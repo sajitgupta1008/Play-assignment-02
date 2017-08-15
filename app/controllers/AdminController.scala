@@ -28,7 +28,7 @@ class AdminController @Inject()(userRepository: UserRepository, assignmentReposi
       })
   }
 
-  def showAssignmentForm() = Action { implicit request: Request[AnyContent] =>
+  def showAssignmentForm(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
     Ok(views.html.assignment(forms.assignmentForm))
   }
 

@@ -15,6 +15,7 @@ class LoginController @Inject()(userRepository: UserRepository, forms: UserForms
   extends Controller with I18nSupport {
 
   implicit val messages: MessagesApi = messagesApi
+
   def showLoginForm(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
     Ok(views.html.login(forms.loginForm))
   }
@@ -60,7 +61,6 @@ class LoginController @Inject()(userRepository: UserRepository, forms: UserForms
           case true => Redirect(routes.LoginController.showLoginForm()).flashing("passwordchanged" ->
             "Password changed successfully. You can log in.")
         }
-
       })
   }
 }
