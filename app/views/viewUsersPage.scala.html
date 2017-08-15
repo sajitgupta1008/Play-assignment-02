@@ -25,11 +25,11 @@
         <tr> @helper.form(action=routes.AdminController.enableOrDisableUser(user.userName,user.isEnabled)){
             <td>@user.userName</td>
             @if(user.isEnabled){
-            <td><button value="@user.userName"  disabled>Enable</button></td>
-            <td><button value="@user.userName" >Disable</button></td>
+            <td><button value="@user.userName" class="btn btn-info disabled" >Enable</button></td>
+            <td><button value="@user.userName"  class="btn btn-danger">Disable</button></td>
             }else{
-            <td><button value="@user.userName" >Enable</button></td>
-            <td><button value="@user.userName" disabled>Disable</button></td>
+            <td><button value="@user.userName"  class="btn btn-info">Enable</button></td>
+            <td><button value="@user.userName" class="btn btn-danger disabled">Disable</button></td>
             }}
         </tr>
         }
