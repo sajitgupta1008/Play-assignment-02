@@ -26,6 +26,7 @@ class LoginControllerTest extends PlaySpec with MockitoSugar with GuiceOneAppPer
   val loginController = new LoginController(userRepository, forms, messages)
 
   "LoginController" should {
+
     "show login form" in {
       val result = loginController.showLoginForm().apply(FakeRequest("GET", "/"))
       implicit val timeout = Timeout(10 seconds)
@@ -48,6 +49,7 @@ class LoginControllerTest extends PlaySpec with MockitoSugar with GuiceOneAppPer
       implicit val timeout = Timeout(10 seconds)
       redirectLocation(result) mustBe Some("/getDetails")
     }
+
     "handle when login details are invalid" in {
       when(userRepository.matchUserLoginDetails("sajit@gmail.com", "qwerty123"))
         .thenReturn(Future.successful(false))
@@ -58,6 +60,7 @@ class LoginControllerTest extends PlaySpec with MockitoSugar with GuiceOneAppPer
       implicit val timeout = Timeout(10 seconds)
       redirectLocation(result) mustBe Some("/login")
     }
+
     "handle when user is disabled" in {
       when(userRepository.matchUserLoginDetails("sajit@gmail.com", "qwerty123"))
         .thenReturn(Future.successful(true))
@@ -68,12 +71,6 @@ class LoginControllerTest extends PlaySpec with MockitoSugar with GuiceOneAppPer
       implicit val timeout = Timeout(10 seconds)
       redirectLocation(result) mustBe Some("/login")
     }
-    /*"handle when login form is with errors" in {
-      val result: Future[Result] = loginController.handleLogin().apply(FakeRequest("GET", "/handlelogin").withFormUrlEncodedBody(
-        "username" -> "", "password" -> ""))
-      implicit val timeout = Timeout(10 seconds)
-      status(result) mustBe 400
-    }*/
 
     "handle the case when passwords are different in forgetPassword form" in {
       val result: Future[Result] = loginController.forgetPassword().apply(FakeRequest("GET", "/handlelogin").withFormUrlEncodedBody(
@@ -82,6 +79,7 @@ class LoginControllerTest extends PlaySpec with MockitoSugar with GuiceOneAppPer
 
       status(result) mustBe 400
     }
+
     "handle forgetPassword form with success" in {
       when(userRepository.updatePassword("sajit@gmail.com", "qwerty123")).thenReturn(Future.successful(true))
       val result: Future[Result] = loginController.forgetPassword().apply(FakeRequest("GET", "/handlelogin").withFormUrlEncodedBody(
@@ -90,6 +88,7 @@ class LoginControllerTest extends PlaySpec with MockitoSugar with GuiceOneAppPer
 
       redirectLocation(result) mustBe Some("/login")
     }
+
     "handle forgetPassword form when email not exists" in {
       when(userRepository.updatePassword("sajit@gmail.com", "qwerty123")).thenReturn(Future.successful(false))
       val result: Future[Result] = loginController.forgetPassword().apply(FakeRequest("GET", "/handlelogin").withFormUrlEncodedBody(
@@ -98,7 +97,5 @@ class LoginControllerTest extends PlaySpec with MockitoSugar with GuiceOneAppPer
 
       redirectLocation(result) mustBe Some("/forget")
     }
-
-
   }
 }

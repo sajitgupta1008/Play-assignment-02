@@ -9,6 +9,10 @@ GET     /                           controllers.HomeController.index
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
 
+GET     /loginaction                controllers.HomeController.loginAction
+
+GET     /registeraction             controllers.HomeController.registerAction
+
 GET      /register                  controllers.RegistrationController.showRegisterForm
 
 POST     /handleregister            controllers.RegistrationController.handleRegister
@@ -18,25 +22,23 @@ GET      /login                     controllers.LoginController.showLoginForm
 POST     /handlelogin               controllers.LoginController.handleLogin
 
 GET      /forget                    controllers.LoginController.showForgetForm
-POST     /handleforget                    controllers.LoginController.forgetPassword
 
+POST     /handleforget              controllers.LoginController.forgetPassword
 
-GET      /userlogout                   controllers.UserProfileController.logout
+GET      /userlogout                controllers.UserProfileController.logout
 
-POST     /updatedetails                 controllers.UserProfileController.updateDetails
+POST     /updatedetails             controllers.UserProfileController.updateDetails
 
-GET      /getDetails                   controllers.UserProfileController.getProfileDetails
+GET      /getDetails                controllers.UserProfileController.getProfileDetails
 
-GET      /showassignment                controllers.AdminController.showAssignmentForm
+GET      /showassignment            controllers.AdminController.showAssignmentForm
 
-POST    /addassignment                   controllers.AdminController.addAssignment
+POST     /addassignment             controllers.AdminController.addAssignment
 
+GET      /viewassignment            controllers.AdminController.viewAssignments
 
+GET      /deleteassignment/:id      controllers.AdminController.deleteAssignment(id:Int)
 
-GET     /viewassignment                 controllers.AdminController.viewAssignments
+GET      /viewusers                 controllers.AdminController.viewUsers
 
-GET      /deleteassignment/:id             controllers.AdminController.deleteAssignment(id:Int)
-
-GET     /viewusers                      controllers.AdminController.viewUsers
-
-GET     /enable/:user/:value            controllers.AdminController.enableOrDisableUser(user,value:Boolean)
+GET      /enable/:user/:value       controllers.AdminController.enableOrDisableUser(user,value:Boolean)

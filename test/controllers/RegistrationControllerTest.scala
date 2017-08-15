@@ -9,7 +9,6 @@ import play.api.i18n.MessagesApi
 import play.api.test.FakeRequest
 import akka.stream.Materializer
 import play.api.mvc.Result
-
 import scala.concurrent.Future
 import play.api.test.Helpers._
 
@@ -29,11 +28,12 @@ class RegistrationControllerTest extends PlaySpec with MockitoSugar with GuiceOn
     , userHobbiesRepository, forms, messages)
 
   "RegistrationController" should {
+
     "show registration form" in {
       val result = registrationController.showRegisterForm().apply(FakeRequest("GET", "/"))
       status(result) mustEqual OK
-
     }
+
     "be able to save signup details from registration form" in {
       when(userRepository.checkUserExists("sajit@gmail.com")).thenReturn(Future.successful(false))
       val mobileNo = 8743922586L
@@ -69,6 +69,7 @@ class RegistrationControllerTest extends PlaySpec with MockitoSugar with GuiceOn
 
     "handle the case where username already exists" in {
       when(userRepository.checkUserExists("sajit@gmail.com")).thenReturn(Future.successful(true))
+
       val result: Future[Result] = registrationController.handleRegister().apply(FakeRequest("GET", "/handleregister").withFormUrlEncodedBody(
         "name" -> "sajit", "middleName" -> "", "lastName" -> "gupta", "userName" -> "sajit@gmail.com", "password" -> "qwerty123",
         "re_enterPassword" -> "qwerty123", "mobileNo" -> "8743922586", "gender" -> "male", "age" -> "23",
@@ -86,5 +87,4 @@ class RegistrationControllerTest extends PlaySpec with MockitoSugar with GuiceOn
       status(result) mustBe 400
     }
   }
-
 }

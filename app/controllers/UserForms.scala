@@ -13,10 +13,12 @@ case class ForgetPassword(email: String, newPassword: String, confirmPassword: S
 case class Profile(name: String, middleName: Option[String], lastName: String
                    , mobileNo: Long, gender: String, age: Int, hobbies: List[String])
 
-case class Assignment(title:String, description:String)
+case class Assignment(title: String, description: String)
 
 class UserForms {
 
+  val minAge = 18
+  val maxAge = 75
   val registerForm = Form(mapping(
     "name" -> nonEmptyText.verifying(allLettersConstraint),
     "middleName" -> optional(text).verifying("name can only contain letters",
@@ -27,17 +29,15 @@ class UserForms {
     "re_enterPassword" -> nonEmptyText.verifying(passwordCheckConstraint),
     "mobileNo" -> longNumber.verifying(checkLengthConstraint),
     "gender" -> nonEmptyText,
-    "age" -> number(min = 18, max = 75),
-    "hobbies" -> list(text).verifying(hobbyConstraint)
-  )(User.apply)(User.unapply)
-    verifying("Password fields do not match", user => user.password == user.re_enterPassword)
-  )
+    "age" -> number(min = minAge, max = maxAge),
+    "hobbies" -> list(text).verifying(hobbyConstraint))
+  (User.apply)(User.unapply)
+    verifying("Password fields do not match", user => user.password == user.re_enterPassword))
 
   val loginForm = Form(mapping(
     "username" -> email,
     "password" -> nonEmptyText
   )(LoginUser.apply)(LoginUser.unapply))
-
 
   val forgetPasswordForm: Form[ForgetPassword] = Form(mapping(
     "email" -> email,
@@ -53,7 +53,7 @@ class UserForms {
     "lastName" -> nonEmptyText.verifying(allLettersConstraint),
     "mobileNo" -> longNumber.verifying(checkLengthConstraint),
     "gender" -> nonEmptyText,
-    "age" -> number(min = 18, max = 75),
+    "age" -> number(min = minAge, max = maxAge),
     "hobbies" -> list(text).verifying(hobbyConstraint)
   )(Profile.apply)(Profile.unapply))
 
@@ -64,30 +64,35 @@ class UserForms {
 
   def allLettersConstraint: Constraint[String] = {
     Constraint("usernameCheck")(
-      name => if (name matches """[A-Za-z]+""")
+      name => if (name matches """[A-Za-z]+""") {
         Valid
-      else
+      } else {
         Invalid(ValidationError("name can only contain letters"))
+      }
     )
   }
 
   def checkLengthConstraint: Constraint[Long] = {
     Constraint("mobile no must be of 10 digits")({
       mobile =>
-        if (mobile.toString.length == 10)
+        if (mobile.toString.length == 10) {
           Valid
-        else
+        }
+        else {
           Invalid(ValidationError("mobile number must be 10 digits"))
+        }
     })
   }
 
-  def hobbyConstraint:Constraint[List[String]] = {
-    Constraint("Select atleast one hobby."){
+  def hobbyConstraint: Constraint[List[String]] = {
+    Constraint("Select atleast one hobby.") {
       list =>
-        if(list.isEmpty)
+        if (list.isEmpty) {
           Invalid("Select atleast one hobby.")
-        else
+        }
+        else {
           Valid
+        }
     }
   }
 

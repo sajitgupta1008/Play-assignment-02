@@ -8,8 +8,7 @@ import slick.lifted.ProvenShape
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-
-  case class HobbyData(id:Int, hobby: String)
+case class HobbyData(id: Int, hobby: String)
 
 @Singleton
 class HobbiesRepository @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) extends HobbyRepositoryTable {
@@ -17,9 +16,8 @@ class HobbiesRepository @Inject()(protected val dbConfigProvider: DatabaseConfig
   import driver.api._
 
   def getHobbies: Future[List[String]] = {
-        db.run(hobbyQuery.map(_.hobby).to[List].result)
+    db.run(hobbyQuery.map(_.hobby).to[List].result)
   }
-
 }
 
 

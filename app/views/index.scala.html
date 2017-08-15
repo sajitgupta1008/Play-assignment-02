@@ -1,5 +1,22 @@
 @()
 
+@import helper._
+
 @main("Welcome to Play") {
-  <h1>Welcome to Play!</h1>
+<h1>Welcome to Play!</h1>
+
+<div class="text-center">
+<br/>
+    <br/>
+    <br/>
+    @helper.form(action=routes.HomeController.loginAction){
+    <button class="btn-lg" value="">Login</button>
+    }
+    <br/>
+    <br/>
+    <br/>
+    @helper.form(action=routes.HomeController.registerAction){
+    <button class="btn-lg">Register</button>
+    }
+</div>
 }

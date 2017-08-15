@@ -12,9 +12,10 @@ class UserProfileController @Inject()(userRepository: UserRepository, hobbyRepos
                                       userHobbiesRepository: UserHobbiesRepository, forms: UserForms, val messagesApi: MessagesApi)
   extends Controller with I18nSupport {
 
+  implicit val messages: MessagesApi = messagesApi
 
   def logout(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
-    Redirect(routes.HomeController.index()).withNewSession //TODO proper logout with no back button
+    Redirect(routes.HomeController.index()).withNewSession
   }
 
   def getProfileDetails: Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
@@ -26,13 +27,12 @@ class UserProfileController @Inject()(userRepository: UserRepository, hobbyRepos
 
     for {details <- userDetails
          hobbies <- userHobbies
-    isadmin<-isAdmin}
+         isadmin <- isAdmin}
       yield {
         val profile = Profile(details.firstName, details.middleName, details.lastName,
           details.mobileNo, details.gender, details.age, hobbies)
-        Ok(views.html.userProfile(forms.profileForm.fill(profile), hobbies,isadmin))
+        Ok(views.html.userProfile(forms.profileForm.fill(profile), hobbies, isadmin))
       }
-
   }
 
   def updateDetails(): Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
@@ -43,16 +43,17 @@ class UserProfileController @Inject()(userRepository: UserRepository, hobbyRepos
         val userHobbies: Future[List[String]] = userHobbiesRepository.getUserHobbies(request.session.get("email").get)
         val isAdmin: Future[Boolean] = userRepository.isAdmin(request.session.get("email").get)
         for {hobbies <- userHobbies
-             isadmin<-isAdmin}
-        yield{ BadRequest(views.html.userProfile(formWithErrors, hobbies,isadmin))}
+             isadmin <- isAdmin}
+          yield {
+            BadRequest(views.html.userProfile(formWithErrors, hobbies, isadmin))
+          }
       },
 
       profile => {
-
         val updatedDetails: UserProfileData = UserProfileData(profile.name, profile.middleName, profile.lastName,
           profile.mobileNo, profile.gender, profile.age)
-        val userUpdated = userRepository.updateUserDetails(request.session.get("email").get, updatedDetails)
-        val hobbiesUpdated = userHobbiesRepository.updateHobbies(request.session.get("email").get, profile.hobbies)
+        val userUpdated: Future[Boolean] = userRepository.updateUserDetails(request.session.get("email").get, updatedDetails)
+        val hobbiesUpdated: Future[Option[Int]] = userHobbiesRepository.updateHobbies(request.session.get("email").get, profile.hobbies)
 
         userUpdated.flatMap {
           case true => hobbiesUpdated.map {
@@ -62,7 +63,6 @@ class UserProfileController @Inject()(userRepository: UserRepository, hobbyRepos
           }
           case false => Future.successful(InternalServerError("user details could not be updated"))
         }
-
       })
   }
 }

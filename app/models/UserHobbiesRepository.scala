@@ -7,9 +7,7 @@ import slick.lifted.ProvenShape
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-
 case class UserHobbyData(userName: String, hobbyName: String)
-
 
 @Singleton
 class UserHobbiesRepository @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) extends UserHobbyTable {

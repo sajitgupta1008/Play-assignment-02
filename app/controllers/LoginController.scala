@@ -43,7 +43,6 @@ class LoginController @Inject()(userRepository: UserRepository, forms: UserForms
             Redirect(routes.LoginController.showLoginForm()).flashing("disabled" -> "Your account has been disabled by admin.")
           }
         }
-
       })
   }
 
