@@ -12,6 +12,8 @@ class AdminController @Inject()(userRepository: UserRepository, assignmentReposi
                                 , forms: UserForms, val messagesApi: MessagesApi)
   extends Controller with I18nSupport {
 
+  implicit val messages: MessagesApi = messagesApi
+
   def addAssignment(): Action[AnyContent] = Action.async { implicit request: Request[AnyContent] =>
     forms.assignmentForm.bindFromRequest.fold(
       formWithErrors => {
@@ -37,7 +39,7 @@ class AdminController @Inject()(userRepository: UserRepository, assignmentReposi
     val assignments: Future[List[AssignmentData]] = assignmentRepository.getAssignments()
 
     val isAdmin = userRepository.isAdmin(request.session.get("email").get)
-    isAdmin.flatMap(isadmin=>assignments.map(assignment => Ok(views.html.viewAssignments(assignment, isadmin))))
+    isAdmin.flatMap(isadmin => assignments.map(assignment => Ok(views.html.viewAssignments(assignment, isadmin))))
 
   }
 
@@ -55,8 +57,6 @@ class AdminController @Inject()(userRepository: UserRepository, assignmentReposi
     list.map { userList =>
       Ok(views.html.viewUsersPage(userList.filter(
         _.userName != request.session.get("email").get)))
-     /* Ok(views.html.viewUsersPage(userList.filter(
-        _.userName != "")))*/
     }
   }
 

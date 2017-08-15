@@ -13,6 +13,8 @@ isenabled boolean NOT NULL,
 PRIMARY KEY(id)
 );
 
+#password of sajit@gmail.com is qwerty123 (admin)
+
 insert into userdatatable(firstname,lastname,username,password,mobileno,gender,age,isadmin
 ,isenabled) values('sajit','gupta','sajit@gmail.com','$2a$10$OheicC7rvlhpRSUDS12G8.FLaCe.AEQkZT/8ld/asUQlUlCDYISPG',
 8743922586,'male',23,true,true);
