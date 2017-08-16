@@ -22,7 +22,7 @@
         <tr>
             <th style="width:10%">Title</th>
             <th style="width:80%">Description</th>
-            <th style="width:10%">Action</th>
+            <th style="width:10%"> @if(isAdmin){Action}</th>
         </tr>
         </thead>
 
@@ -30,8 +30,9 @@
         <tr> @helper.form(action=routes.AdminController.deleteAssignment(assignment.id)){
             <td>@assignment.title</td>
             <td>@assignment.description</td>
-            <td>
+            <td>@if(isAdmin){
                 <button value="@assignment.id">Delete</button>
+                }
             </td>
             }
         </tr>

@@ -17,7 +17,7 @@ class UserHobbiesRepositoryTest extends PlaySpec {
     }
     "get hobbies" in {
       val result = modelsTest.result(modelsTest.repository.getUserHobbies(userName))
-      result mustEqual hobbies
+      result mustEqual "reading"::hobbies
     }
     "delete hobbies" in {
       val result = modelsTest.result(modelsTest.repository.deleteHobbies(userName))

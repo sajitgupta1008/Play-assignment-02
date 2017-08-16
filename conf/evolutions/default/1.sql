@@ -31,6 +31,8 @@ username VARCHAR(30) NOT NULL,
 hobbyname VARCHAR(20) NOT NULL
 );
 
+insert into userhobbytable(username,hobbyname) values ('sajit@gmail.com','reading');
+
 create table if not exists assignmenttable(
 id serial NOT NULL,
 title VARCHAR(30) NOT NULL,
