@@ -113,7 +113,8 @@ trait UserTable extends HasDatabaseConfigProvider[JdbcProfile] {
 
     def isEnabled: Rep[Boolean] = column[Boolean]("isenabled")
 
-    override def * : ProvenShape[UserData] = (id, firstName, middleName, lastName, userName, password, mobileNo, gender, age, isAdmin, isEnabled) <> (UserData.tupled,
+    override def * : ProvenShape[UserData] = (id, firstName, middleName, lastName,
+      userName, password, mobileNo, gender, age, isAdmin, isEnabled) <> (UserData.tupled,
       UserData.unapply)
   }
 

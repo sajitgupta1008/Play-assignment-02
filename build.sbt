@@ -18,7 +18,9 @@ libraryDependencies ++= Seq(
 
   specs2 % Test,
   evolutions
+
 )
+coverageExcludedPackages := """controllers\..*Reverse.*;router.Routes.*;"""
 // https://mvnrepository.com/artifact/org.mindrot/jbcrypt
 libraryDependencies += "org.mindrot" % "jbcrypt" % "0.3m"
 libraryDependencies += "com.h2database" % "h2" % "1.4.188"
